@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090e1a"/>
+      <stop offset="100%" stop-color="#15102a"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <rect width="496" height="496" x="8" y="8" rx="120" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8"/>
+  <!-- Medical Heart Icon -->
+  <g transform="translate(136, 120)">
+    <!-- Heart shape with glow -->
+    <path d="M120 216.5l-11.45-10.32C45.4 151.36 12 120.28 12 82.5 12 51.42 36.42 27 67.5 27c17.4 0 34.1 8.1 45 20.9C123.4 35.1 140.1 27 157.5 27c31.08 0 55.5 24.42 55.5 55.5 0 37.78-33.4 68.86-84.55 115.54L120 216.5z" 
+          fill="none" stroke="url(#glow)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"
+          filter="drop-shadow(0 0 15px rgba(56, 189, 248, 0.6))"/>
+    <!-- Pulse lines inside the heart -->
+    <path d="M60 90h30l15-30 15 60 15-40 15 10h30" 
+          fill="none" stroke="#38bdf8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

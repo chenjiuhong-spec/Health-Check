@@ -1,0 +1,17 @@
+{
+  "name": "智能健康语音助理",
+  "short_name": "健康助理",
+  "description": "您的随身语音健康备忘录与智能AI问诊助理",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#090e1a",
+  "theme_color": "#090e1a",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

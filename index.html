@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能健康语音助理 - 您的随身医疗备忘录</title>
+  <!-- 引入现代字体，并确保中文字体易读 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- PWA 移动端一键启动与全屏体验配置 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="健康助理">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 顶部状态栏 -->
+    <header class="app-header">
+      <div class="header-logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        <h1>智能健康语音助理</h1>
+      </div>
+      <div class="header-actions">
+        <button id="btn-settings" class="icon-button" aria-label="设置 API Key">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- API Key 未配置警告横幅 -->
+    <div id="api-key-banner" class="alert-banner hidden">
+      <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <span>请先点击右上角设置，配置您的 Gemini API Key 以启用智能搜索与分析服务。</span>
+    </div>
+
+    <!-- 主控台区域 (巨型动作按钮) -->
+    <main class="main-dashboard">
+      <div class="action-grid">
+        <!-- 按钮1：语音录入 -->
+        <button id="action-record" class="action-card card-record">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <h2>语音录入信息</h2>
+            <p>录下您的吃药、就医或不舒服的信息</p>
+          </div>
+        </button>
+
+        <!-- 按钮2：语音提问 -->
+        <button id="action-ask" class="action-card card-ask">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <circle cx="9" cy="10" r="1" fill="currentColor"/>
+              <circle cx="12" cy="10" r="1" fill="currentColor"/>
+              <circle cx="15" cy="10" r="1" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <h2>健康检索问诊</h2>
+            <p>语音提问，AI 帮您在保存的记录中查找答案并念出来</p>
+          </div>
+        </button>
+
+        <!-- 按钮3：上传文件 -->
+        <button id="action-upload" class="action-card card-upload">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <h2>上传健康文件</h2>
+            <p>一键上传化验单、药单、门诊病历（支持图片/PDF/文本）</p>
+          </div>
+          <input type="file" id="file-input" accept="image/*,application/pdf,text/*" class="hidden-input">
+        </button>
+      </div>
+
+      <!-- 数据浏览区 -->
+      <section class="records-section">
+        <div class="section-header">
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="header-icon">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            我的健康档案
+          </h2>
+          <div class="filter-tabs">
+            <button class="tab-button active" data-tab="all">全部</button>
+            <button class="tab-button" data-tab="notes">就医记录</button>
+            <button class="tab-button" data-tab="files">健康文档</button>
+          </div>
+        </div>
+
+        <div id="records-list" class="records-list">
+          <!-- 动态载入列表 -->
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <p>目前还没有保存任何记录，点击上方按钮开始录入吧！</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 设置弹窗 (API Key 配置等) -->
+    <div id="modal-settings" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>设置中心</h3>
+          <button class="close-button" id="btn-close-settings">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="input-api-key">Gemini API Key</label>
+            <input type="password" id="input-api-key" placeholder="请输入以 AIzaSy 开头的 API Key">
+            <p class="help-text">智能问诊与健康文档自动分析需要配置 Gemini API Key。您的 Key 仅安全地存放在浏览器本地。</p>
+          </div>
+          <div class="form-group">
+            <label for="select-voice-rate">语音播报语速</label>
+            <select id="select-voice-rate">
+              <option value="0.7">极慢 (适合高龄老人)</option>
+              <option value="0.85" selected>偏慢 (推荐)</option>
+              <option value="1.0">正常</option>
+              <option value="1.2">偏快</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="select-text-size">界面文字大小</label>
+            <select id="select-text-size">
+              <option value="standard">标准</option>
+              <option value="large" selected>放大 (适合老人)</option>
+              <option value="huge">特大 (超清视界)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>档案同步与备份 (可保存至 OneDrive)</label>
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+              <button id="btn-export-db" class="secondary-button" style="flex: 1; font-size: 1rem; padding: 0.6rem;">导出备份文件</button>
+              <button id="btn-import-db" class="secondary-button" style="flex: 1; font-size: 1rem; padding: 0.6rem;">导入备份文件</button>
+            </div>
+            <input type="file" id="import-db-input" accept=".json" class="hidden-input">
+            <p class="help-text">您可以将导出的备份文件存放在 OneDrive 目录中。在手机或其他设备上导入该文件即可实现数据同步。</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-clear-db" class="secondary-button danger-button">清空所有数据</button>
+          <button id="btn-save-settings" class="primary-button">保存设置</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 语音录制交互弹窗 (针对“语音录入”和“语音提问”) -->
+    <div id="modal-speech" class="modal-overlay hidden">
+      <div class="modal-card speech-card">
+        <div class="modal-header">
+          <h3 id="speech-modal-title">正在听取中...</h3>
+          <button class="close-button" id="btn-close-speech">&times;</button>
+        </div>
+        <div class="modal-body text-center">
+          <!-- 麦克风录音脉冲动画 -->
+          <div class="speech-anim-container">
+            <div class="pulse-ring pulse-1"></div>
+            <div class="pulse-ring pulse-2"></div>
+            <div class="pulse-ring pulse-3"></div>
+            <div class="mic-icon-wrapper">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mic-pulsing-icon">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+              </svg>
+            </div>
+          </div>
+
+          <p class="speech-hint" id="speech-modal-hint">请开始说话...</p>
+
+          <!-- 实时转写文字框 -->
+          <div class="transcript-container">
+            <textarea id="speech-transcript-text" rows="3" placeholder="您说的话会实时显示在这里..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer justify-center">
+          <button id="btn-speech-stop" class="primary-button pulse-button-glow">说完了 (停止录音)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 语音录入确认弹窗 -->
+    <div id="modal-record-confirm" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>核对录入的看病记录</h3>
+          <button class="close-button" id="btn-close-confirm">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="confirm-intro-text">如果您说的话有错字，可以直接在下方框内进行修改：</p>
+          <div class="edit-container">
+            <textarea id="confirm-record-text" rows="6"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-confirm-cancel" class="secondary-button">取消</button>
+          <button id="btn-confirm-save" class="primary-button">确认并保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 智能问诊回答弹窗 -->
+    <div id="modal-answer" class="modal-overlay hidden">
+      <div class="modal-card answer-card">
+        <div class="modal-header">
+          <h3>助理健康解答</h3>
+          <button class="close-button" id="btn-close-answer">&times;</button>
+        </div>
+        <div class="modal-body">
+          <!-- 提问回顾 -->
+          <div class="question-retrospect">
+            <span class="retro-label">您的提问：</span>
+            <p id="answer-question-text" class="retro-content"></p>
+          </div>
+
+          <!-- 回答内容 -->
+          <div class="answer-container">
+            <!-- 播音指示动画 -->
+            <div id="tts-audio-indicator" class="audio-waves hidden">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div id="answer-loading" class="loading-container hidden">
+              <div class="spinner"></div>
+              <p>AI 正在帮您在病历与文档中检索并思考答案，请稍候...</p>
+            </div>
+            <div id="answer-content-area" class="answer-content">
+              <!-- AI 回答文本 -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-between">
+          <button id="btn-answer-replay" class="secondary-button flex-center">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+            重新播放语音
+          </button>
+          <button id="btn-answer-close" class="primary-button">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 文档摘要与详情弹窗 -->
+    <div id="modal-doc-detail" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="doc-title-text">健康文档详情</h3>
+          <button class="close-button" id="btn-close-doc">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="doc-meta-info">
+            <span class="meta-tag" id="doc-type-tag">PDF</span>
+            <span class="meta-time" id="doc-time-text">2026-07-08</span>
+          </div>
+
+          <!-- 原文件展示区（只显示图片预览，如果是PDF或文本则提供下载/图标） -->
+          <div id="doc-preview-container" class="doc-preview-box">
+            <!-- 动态生成预览 -->
+          </div>
+
+          <!-- AI解析摘要 -->
+          <div class="doc-summary-container">
+            <h4>AI 智能提取的摘要：</h4>
+            <div id="doc-summary-content" class="doc-summary-text">
+              <!-- AI摘要 -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-doc-delete" class="secondary-button danger-button">删除此文件</button>
+          <button id="btn-doc-close" class="primary-button">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 上传中 loading 提示 -->
+    <div id="global-loading" class="global-overlay hidden">
+      <div class="loading-spinner-card">
+        <div class="spinner large-spinner"></div>
+        <h3 id="loading-msg-title">文件分析中</h3>
+        <p id="loading-msg-desc">AI 正在努力提取报告和病历的医学信息，请稍候...</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

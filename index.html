@@ -15,6 +15,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="健康助理">
   <link rel="apple-touch-icon" href="icon.svg">
+  <!-- 引入 PDF.js 客户端文本提取库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -43,7 +45,7 @@
         <line x1="12" y1="9" x2="12" y2="13"/>
         <line x1="12" y1="17" x2="12.01" y2="17"/>
       </svg>
-      <span>请先点击右上角设置，配置您的 Gemini API Key 以启用智能搜索与分析服务。</span>
+      <span>请先点击右上角设置，配置您的大模型服务商与 API Key 以启用智能问诊与分析服务。</span>
     </div>
 
     <!-- 主控台区域 (巨型动作按钮) -->
@@ -141,9 +143,29 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="input-api-key">Gemini API Key</label>
-            <input type="password" id="input-api-key" placeholder="请输入以 AIzaSy 开头的 API Key">
-            <p class="help-text">智能问诊与健康文档自动分析需要配置 Gemini API Key。您的 Key 仅安全地存放在浏览器本地。</p>
+            <label for="select-provider">大模型服务商</label>
+            <select id="select-provider">
+              <option value="gemini" selected>Google Gemini</option>
+              <option value="deepseek">DeepSeek</option>
+              <option value="qwen">阿里通义千问 (DashScope)</option>
+              <option value="doubao">字节豆包 (Volcengine)</option>
+              <option value="openai">其他 OpenAI 兼容接口</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="input-api-url">API 接口地址</label>
+            <input type="text" id="input-api-url" placeholder="自动填充默认地址">
+            <p class="help-text">使用官方默认接口可留空。使用自定义反代或代理请输入完整地址（如 https://api.deepseek.com/v1）。</p>
+          </div>
+          <div class="form-group">
+            <label for="input-model-name">模型名称</label>
+            <input type="text" id="input-model-name" placeholder="例如 gemini-2.5-flash">
+            <p class="help-text">填入要使用的模型 ID。字节豆包请填入您的接入点 Endpoint ID。</p>
+          </div>
+          <div class="form-group">
+            <label for="input-api-key">API Key (密钥)</label>
+            <input type="password" id="input-api-key" placeholder="请输入对应模型服务商的 API Key">
+            <p class="help-text">所有的配置信息和密钥仅安全保存在您的本地浏览器中，不经过任何中转服务器。</p>
           </div>
           <div class="form-group">
             <label for="select-voice-rate">语音播报语速</label>
@@ -163,13 +185,13 @@
             </select>
           </div>
           <div class="form-group">
-            <label>档案同步与备份 (可保存至 OneDrive)</label>
+            <label>档案同步与备份</label>
             <div style="display: flex; gap: 10px; margin-top: 5px;">
               <button id="btn-export-db" class="secondary-button" style="flex: 1; font-size: 1rem; padding: 0.6rem;">导出备份文件</button>
               <button id="btn-import-db" class="secondary-button" style="flex: 1; font-size: 1rem; padding: 0.6rem;">导入备份文件</button>
             </div>
             <input type="file" id="import-db-input" accept=".json" class="hidden-input">
-            <p class="help-text">您可以将导出的备份文件存放在 OneDrive 目录中。在手机或其他设备上导入该文件即可实现数据同步。</p>
+            <p class="help-text">您可以导出备份文件，然后在手机或其他设备上导入该文件即可实现数据同步。</p>
           </div>
         </div>
         <div class="modal-footer">
@@ -309,6 +331,23 @@
         <div class="modal-footer">
           <button id="btn-doc-delete" class="secondary-button danger-button">删除此文件</button>
           <button id="btn-doc-close" class="primary-button">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 自定义确认对话框 (替代原生 confirm) -->
+    <div id="modal-custom-confirm" class="modal-overlay hidden">
+      <div class="modal-card" style="max-width: 420px;">
+        <div class="modal-header">
+          <h3 id="custom-confirm-title">确认操作</h3>
+          <button class="close-button" id="btn-custom-confirm-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p id="custom-confirm-message" style="font-size: 1.1rem; line-height: 1.6; text-align: center; padding: 0.5rem 0;"></p>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-custom-confirm-cancel" class="secondary-button">取消</button>
+          <button id="btn-custom-confirm-ok" class="primary-button" style="background: linear-gradient(135deg, #ef4444, #dc2626);">确认</button>
         </div>
       </div>
     </div>
